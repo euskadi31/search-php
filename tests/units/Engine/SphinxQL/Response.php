@@ -39,7 +39,7 @@ class Response extends Search\Test\Unit
             ->isEqualTo(2);
 
         $this->array($response->keys())
-            ->isEqualTo([1, 5]);
+            ->isEqualTo(array(1, 5));
 
         $this->array($response->toArray())
             ->isEqualTo(array(
