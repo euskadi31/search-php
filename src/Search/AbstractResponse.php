@@ -23,7 +23,7 @@ abstract class AbstractResponse implements Iterator, ArrayAccess, Countable, Res
      *
      * @var array
      */
-    protected $container = [];
+    protected $container = array();
 
     /**
      *
