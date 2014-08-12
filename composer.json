@@ -1,0 +1,31 @@
+{
+    "name": "euskadi31/search-php",
+    "type": "library",
+    "description": "Search engine wrapper",
+    "keywords": ["search", "engine", "sphinx", "sphinxql", "elasticsearch"],
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Axel Etcheverry",
+            "email": "axel@etcheverry.biz",
+            "homepage": "https://twitter.com/euskadi31"
+        }
+    ],
+    "require": {
+        "php": ">=5.3.3"
+    },
+    "require-dev": {
+        "atoum/atoum": "dev-master"
+    },
+    "suggest": {
+        "ext-sphinx": "Required for Sphinx engine."
+    },
+    "autoload": {
+        "psr-0": {
+            "Search": "src/"
+        }
+    },
+    "config": {
+        "bin-dir": "bin/"
+    }
+}
