@@ -38,12 +38,12 @@ class SphinxQL implements SearchInterface, IndexerInterface
     /**
      * @var array
      */
-    protected $filters = [];
+    protected $filters = array();
 
     /**
      * @var array
      */
-    protected $options = [];
+    protected $options = array();
 
     /**
      * @var string
