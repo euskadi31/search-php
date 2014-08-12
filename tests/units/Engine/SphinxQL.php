@@ -201,7 +201,7 @@ class SphinxQL extends Search\Test\Unit
 
         $search = new Search\Engine\SphinxQL();
         $search->setPdo($pdo);
-        $search->setFilter('category_id', [123, 456]);
+        $search->setFilter('category_id', array(123, 456));
 
         $response = $search->search('music', 'test');
 
