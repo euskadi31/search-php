@@ -19,18 +19,18 @@ class Response extends Search\Test\Unit
 {
     public function testConstructor()
     {
-        $response = new Search\Engine\SphinxQL\Response([
-            [
+        $response = new Search\Engine\SphinxQL\Response(array(
+            array(
                 "id"        => 1,
                 "agency_id" => 1,
                 "weight"    => 2302
-            ],
-            [
+            ),
+            array(
                 "id"        => 5,
                 "agency_id" => 1,
                 "weight"    => 2302
-            ]
-        ]);
+            )
+        ));
 
         $this->object($response)
             ->isInstanceOf('\Search\ResponseInterface');
@@ -42,17 +42,17 @@ class Response extends Search\Test\Unit
             ->isEqualTo([1, 5]);
 
         $this->array($response->toArray())
-            ->isEqualTo([
-                1 => [
+            ->isEqualTo(array(
+                1 => array(
                     "id"        => 1,
                     "agency_id" => 1,
                     "weight"    => 2302
-                ],
-                5 => [
+                ),
+                5 => array(
                     "id"        => 5,
                     "agency_id" => 1,
                     "weight"    => 2302
-                ]
-            ]);
+                )
+            ));
     }
 }

@@ -19,13 +19,13 @@ class Response extends Search\Test\Unit
 {
     public function testConstructor()
     {
-        $response = new Search\Engine\Sphinx\Response([
+        $response = new Search\Engine\Sphinx\Response(array(
             "status" => 0,
             "error" => "",
             "warning" => "",
             "total" => 0,
-            "matches" => []
-        ]);
+            "matches" => array()
+        ));
 
         $this->object($response)
             ->isInstanceOf('\Search\ResponseInterface');
@@ -36,15 +36,15 @@ class Response extends Search\Test\Unit
 
     public function testResponseOk()
     {
-        $response = new Search\Engine\Sphinx\Response([
+        $response = new Search\Engine\Sphinx\Response(array(
             "status" => 0,
             "error" => "",
             "warning" => "",
             "total" => 1,
-            "matches" => [
-                1 => []
-            ]
-        ]);
+            "matches" => array(
+                1 => array()
+            )
+        ));
 
         $this->boolean($response->isError())->isFalse();
         $this->boolean($response->isWarning())->isFalse();
@@ -53,14 +53,13 @@ class Response extends Search\Test\Unit
 
     public function testResponseError()
     {
-        $response = new Search\Engine\Sphinx\Response([
+        $response = new Search\Engine\Sphinx\Response(array(
             "status" => 1,
             "error" => "Connetion lost",
             "warning" => "",
             "total" => 0,
-            "matches" => [
-            ]
-        ]);
+            "matches" => array()
+        ));
 
         $this->boolean($response->isError())->isTrue();
         $this->boolean($response->isWarning())->isFalse();
@@ -68,21 +67,20 @@ class Response extends Search\Test\Unit
 
         $this->string($response->getError())->isEqualTo("Connetion lost");
 
-        $this->array($response->getMessages())->isEqualTo([
+        $this->array($response->getMessages())->isEqualTo(array(
             "Connetion lost"
-        ]);
+        ));
     }
 
     public function testResponseWarning()
     {
-        $response = new Search\Engine\Sphinx\Response([
+        $response = new Search\Engine\Sphinx\Response(array(
             "status" => 3,
             "error" => "",
             "warning" => "foo",
             "total" => 0,
-            "matches" => [
-            ]
-        ]);
+            "matches" => array()
+        ));
 
         $this->boolean($response->isError())->isFalse();
         $this->boolean($response->isWarning())->isTrue();
@@ -90,8 +88,8 @@ class Response extends Search\Test\Unit
 
         $this->string($response->getWarning())->isEqualTo("foo");
 
-        $this->array($response->getMessages())->isEqualTo([
+        $this->array($response->getMessages())->isEqualTo(array(
             "foo"
-        ]);
+        ));
     }
 }

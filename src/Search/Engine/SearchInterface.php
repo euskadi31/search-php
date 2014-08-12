@@ -17,5 +17,5 @@ interface SearchInterface
 {
     public function setFilter($key, $value);
 
-    public function search($term, $index, array $fields = []);
+    public function search($term, $index, array $fields = array());
 }

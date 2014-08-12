@@ -26,7 +26,7 @@ class Sphinx extends SphinxClient implements SearchInterface
      * @param  array  $fields
      * @return \Search\Engine\Sphinx\Response
      */
-    public function search($term, $index, array $fields = []) {
+    public function search($term, $index, array $fields = array()) {
         return $this->query($term, $index);
     }
 

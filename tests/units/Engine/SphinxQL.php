@@ -54,10 +54,10 @@ class SphinxQL extends Search\Test\Unit
         $search = new Search\Engine\SphinxQL();
         $search->setPdo($pdo);
 
-        $this->boolean($search->insert('test', [
+        $this->boolean($search->insert('test', array(
             "id"    => 1,
             "name"  => "Axel"
-        ]))->isTrue();
+        )))->isTrue();
     }
 
     public function testSearch()
@@ -76,12 +76,12 @@ class SphinxQL extends Search\Test\Unit
         };
 
         $this->calling($pdos)->fetchAll = function() {
-            return [
-                [
+            return array(
+                array(
                     "id"    => 1,
                     "name"  => 'Music'
-                ]
-            ];
+                )
+            );
         };
 
         $this->calling($pdo)->prepare = function($sql) use ($that, $pdos) {
@@ -104,9 +104,9 @@ class SphinxQL extends Search\Test\Unit
         $this->object($response)
             ->isInstanceOf('\Search\Engine\SphinxQL\Response');
 
-        $this->array($response->keys())->isEqualTo([
+        $this->array($response->keys())->isEqualTo(array(
             1
-        ]);
+        ));
 
         $this->integer($response->count())->isEqualTo(1);
     }
@@ -127,12 +127,12 @@ class SphinxQL extends Search\Test\Unit
         };
 
         $this->calling($pdos)->fetchAll = function() {
-            return [
-                [
+            return array(
+                array(
                     "id"    => 1,
                     "name"  => 'Music'
-                ]
-            ];
+                )
+            );
         };
 
         $this->calling($pdo)->prepare = function($sql) use ($that, $pdos) {
@@ -156,9 +156,9 @@ class SphinxQL extends Search\Test\Unit
         $this->object($response)
             ->isInstanceOf('\Search\Engine\SphinxQL\Response');
 
-        $this->array($response->keys())->isEqualTo([
+        $this->array($response->keys())->isEqualTo(array(
             1
-        ]);
+        ));
 
         $this->integer($response->count())->isEqualTo(1);
     }
@@ -179,12 +179,12 @@ class SphinxQL extends Search\Test\Unit
         };
 
         $this->calling($pdos)->fetchAll = function() {
-            return [
-                [
+            return array(
+                array(
                     "id"    => 1,
                     "name"  => 'Music'
-                ]
-            ];
+                )
+            );
         };
 
         $this->calling($pdo)->prepare = function($sql) use ($that, $pdos) {
@@ -208,9 +208,9 @@ class SphinxQL extends Search\Test\Unit
         $this->object($response)
             ->isInstanceOf('\Search\Engine\SphinxQL\Response');
 
-        $this->array($response->keys())->isEqualTo([
+        $this->array($response->keys())->isEqualTo(array(
             1
-        ]);
+        ));
 
         $this->integer($response->count())->isEqualTo(1);
     }
@@ -231,12 +231,12 @@ class SphinxQL extends Search\Test\Unit
         };
 
         $this->calling($pdos)->fetchAll = function() {
-            return [
-                [
+            return array(
+                array(
                     "id"    => 1,
                     "name"  => 'Music'
-                ]
-            ];
+                )
+            );
         };
 
         $this->calling($pdo)->prepare = function($sql) use ($that, $pdos) {
@@ -261,9 +261,9 @@ class SphinxQL extends Search\Test\Unit
         $this->object($response)
             ->isInstanceOf('\Search\Engine\SphinxQL\Response');
 
-        $this->array($response->keys())->isEqualTo([
+        $this->array($response->keys())->isEqualTo(array(
             1
-        ]);
+        ));
 
         $this->integer($response->count())->isEqualTo(1);
     }
@@ -284,12 +284,12 @@ class SphinxQL extends Search\Test\Unit
         };
 
         $this->calling($pdos)->fetchAll = function() {
-            return [
-                [
+            return array(
+                array(
                     "id"    => 1,
                     "name"  => 'Music'
-                ]
-            ];
+                )
+            );
         };
 
         $this->calling($pdo)->prepare = function($sql) use ($that, $pdos) {
@@ -313,9 +313,9 @@ class SphinxQL extends Search\Test\Unit
         $this->object($response)
             ->isInstanceOf('\Search\Engine\SphinxQL\Response');
 
-        $this->array($response->keys())->isEqualTo([
+        $this->array($response->keys())->isEqualTo(array(
             1
-        ]);
+        ));
 
         $this->integer($response->count())->isEqualTo(1);
     }
@@ -336,12 +336,12 @@ class SphinxQL extends Search\Test\Unit
         };
 
         $this->calling($pdos)->fetchAll = function() {
-            return [
-                [
+            return array(
+                array(
                     "id"    => 1,
                     "name"  => 'Music'
-                ]
-            ];
+                )
+            );
         };
 
         $this->calling($pdo)->prepare = function($sql) use ($that, $pdos) {
@@ -365,9 +365,9 @@ class SphinxQL extends Search\Test\Unit
         $this->object($response)
             ->isInstanceOf('\Search\Engine\SphinxQL\Response');
 
-        $this->array($response->keys())->isEqualTo([
+        $this->array($response->keys())->isEqualTo(array(
             1
-        ]);
+        ));
 
         $this->integer($response->count())->isEqualTo(1);
     }
@@ -388,12 +388,12 @@ class SphinxQL extends Search\Test\Unit
         };
 
         $this->calling($pdos)->fetchAll = function() {
-            return [
-                [
+            return array(
+                array(
                     "id"    => 1,
                     "name"  => 'Music'
-                ]
-            ];
+                )
+            );
         };
 
         $this->calling($pdo)->prepare = function($sql) use ($that, $pdos) {
@@ -418,9 +418,9 @@ class SphinxQL extends Search\Test\Unit
         $this->object($response)
             ->isInstanceOf('\Search\Engine\SphinxQL\Response');
 
-        $this->array($response->keys())->isEqualTo([
+        $this->array($response->keys())->isEqualTo(array(
             1
-        ]);
+        ));
 
         $this->integer($response->count())->isEqualTo(1);
     }

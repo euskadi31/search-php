@@ -150,7 +150,7 @@ class SphinxQL implements SearchInterface, IndexerInterface
             implode(', :', array_keys($data))
         );
 
-        $parameters = [];
+        $parameters = array();
 
         foreach ($data as $key => $value) {
             $parameters[':' . trim($key, ':')] = $value;
@@ -213,7 +213,7 @@ class SphinxQL implements SearchInterface, IndexerInterface
      */
     public function fetch($sql, array $data)
     {
-        $parameters = [];
+        $parameters = array();
 
         foreach ($data as $key => $value) {
             $parameters[':' . trim($key, ':')] = $value;
@@ -232,7 +232,7 @@ class SphinxQL implements SearchInterface, IndexerInterface
      * @param  array  $fields
      * @return \Search\Engine\SphinxQL\Response
      */
-    public function search($term, $index, array $fields = ['*'])
+    public function search($term, $index, array $fields = array('*'))
     {
         $sql = sprintf(
             'SELECT %s FROM %s WHERE MATCH(:term)',
@@ -241,7 +241,7 @@ class SphinxQL implements SearchInterface, IndexerInterface
         );
 
         if (!empty($this->filters)) {
-            $parts = [];
+            $parts = array();
 
             foreach ($this->filters as $key => $value) {
                 if (count($value) > 1) {
@@ -259,7 +259,7 @@ class SphinxQL implements SearchInterface, IndexerInterface
         }
 
         if (!empty($this->options)) {
-            $parts = [];
+            $parts = array();
 
             foreach ($this->options as $key => $value) {
                 $parts[] = sprintf("%s = %s", $key, $value);
@@ -268,8 +268,8 @@ class SphinxQL implements SearchInterface, IndexerInterface
             $sql .= ' OPTION ' . implode(', ', $parts);
         }
 
-        return new Response($this->fetch($sql, [
+        return new Response($this->fetch($sql, array(
             'term' => $term
-        ]));
+        )));
     }
 }
