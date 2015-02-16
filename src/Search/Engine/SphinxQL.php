@@ -56,6 +56,26 @@ class SphinxQL implements SearchInterface, IndexerInterface
     protected $order_by;
 
     /**
+     * @var string
+     */
+    protected $order;
+
+    /**
+     * @var array
+     */
+    protected $fields = array();
+
+    /**
+     * @var integer
+     */
+    protected $distance;
+
+    /**
+     * @var string
+     */
+    protected $distance_field = '_distance';
+
+    /**
      *
      * @param string  $host
      * @param integer $port
@@ -101,6 +121,28 @@ class SphinxQL implements SearchInterface, IndexerInterface
     }
 
     /**
+     * Set the name of distance field
+     *
+     * @param string $name
+     */
+    public function setDistanceField($name)
+    {
+        $this->distance_field = $name;
+
+        return $this;
+    }
+
+    /**
+     * Get the name of distance field
+     *
+     * @return string
+     */
+    public function getDistanceField()
+    {
+        return $this->distance_field;
+    }
+
+    /**
      * Set filter
      *
      * @param string $key
@@ -123,6 +165,24 @@ class SphinxQL implements SearchInterface, IndexerInterface
         return $this;
     }
 
+    public function setGeoFilter($key_lat, $key_long, $latitude, $longitude, $distance)
+    {
+        $precision = ini_get('precision');
+
+        $this->fields[] = sprintf(
+            'GEODIST(%F, %F, %s, %s) AS %s',
+            $latitude,
+            $longitude,
+            $key_lat,
+            $key_long,
+            $this->distance_field
+        );
+
+        $this->distance = (int)$distance;
+
+        return $this;
+    }
+
     /**
      * Add option
      *
@@ -141,9 +201,11 @@ class SphinxQL implements SearchInterface, IndexerInterface
      *
      * @param string $order_by
      */
-    public function setOrderBy($order_by)
+    public function setOrderBy($order_by, $order = null)
     {
         $this->order_by = $order_by;
+
+        $this->order = $order;
 
         return $this;
     }
@@ -249,6 +311,10 @@ class SphinxQL implements SearchInterface, IndexerInterface
      */
     public function search($term, $index, array $fields = array('*'))
     {
+        if (!empty($this->fields)) {
+            $fields = array_merge($fields, $this->fields);
+        }
+
         $sql = sprintf(
             'SELECT %s FROM %s WHERE MATCH(:term)',
             implode(', ', $fields),
@@ -280,8 +346,18 @@ class SphinxQL implements SearchInterface, IndexerInterface
             $sql .= ' AND ' . implode(' AND ', $parts);
         }
 
+        if (!is_null($this->distance)) {
+            $sql .= sprintf(' AND %s < %d', $this->distance_field, $this->distance);
+            $this->order_by = $this->distance_field;
+            $this->order = 'ASC';
+        }
+
         if (!empty($this->order_by)) {
             $sql .= ' ORDER BY ' . $this->order_by;
+
+            if (!empty($this->order)) {
+                $sql .= ' ' . $this->order;
+            }
         }
 
         if (!empty($this->options)) {

@@ -50,6 +50,16 @@ class SphinxQL extends Search\Test\Unit
         $this->object($search->getPdo())->isEqualTo($pdo);
     }
 
+    public function testDistanceField()
+    {
+        $search = new Search\Engine\SphinxQL();
+
+        $this->string($search->getDistanceField())->isEqualTo('_distance');
+
+        $search->setDistanceField('foo');
+        $this->string($search->getDistanceField())->isEqualTo('foo');
+    }
+
     public function testInsert()
     {
         $that = $this;
@@ -491,6 +501,58 @@ class SphinxQL extends Search\Test\Unit
         $search = new Search\Engine\SphinxQL();
         $search->setPdo($pdo);
         $search->setFilterRange('price', 30, 70);
+
+        $response = $search->search('music', 'test');
+
+        $this->object($response)
+            ->isInstanceOf('\Search\Engine\SphinxQL\Response');
+
+        $this->array($response->keys())->isEqualTo(array(
+            1
+        ));
+
+        $this->integer($response->count())->isEqualTo(1);
+    }
+
+    public function testSearchWithGeoFilter()
+    {
+        $that = $this;
+
+        $this->mockGenerator->orphanize('__construct');
+
+        $pdo = new \mock\PDO();
+
+        $pdos = new \mock\PDOStatement();
+
+        $this->calling($pdos)->execute = function($params) {
+
+            return true;
+        };
+
+        $this->calling($pdos)->fetchAll = function() {
+            return array(
+                array(
+                    "id"    => 1,
+                    "name"  => 'Music'
+                )
+            );
+        };
+
+        $this->calling($pdo)->prepare = function($sql) use ($that, $pdos) {
+
+            $that->string("SELECT *, GEODIST(48.824827, 2.369667, lat, long) AS _distance FROM test WHERE MATCH(:term) AND _distance < 10000 ORDER BY _distance ASC")->isEqualTo($sql);
+
+            return $pdos;
+        };
+
+        $this->calling($pdo)->setAttribute = function($key, $val) use ($that) {
+            $that->integer($key)->isEqualTo(\PDO::ATTR_DEFAULT_FETCH_MODE);
+            $that->integer($val)->isEqualTo(\PDO::FETCH_ASSOC);
+        };
+
+        $search = new Search\Engine\SphinxQL();
+        $search->setPdo($pdo);
+        $search->setGeoFilter('lat', 'long', 48.82482710, 2.36966660, 10000);
 
         $response = $search->search('music', 'test');
 
