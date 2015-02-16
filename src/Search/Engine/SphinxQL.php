@@ -167,8 +167,6 @@ class SphinxQL implements SearchInterface, IndexerInterface
 
     public function setGeoFilter($key_lat, $key_long, $latitude, $longitude, $distance)
     {
-        $precision = ini_get('precision');
-
         $this->fields[] = sprintf(
             'GEODIST(%F, %F, %s, %s) AS %s',
             $latitude,
