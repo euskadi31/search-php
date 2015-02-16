@@ -43,6 +43,11 @@ class SphinxQL implements SearchInterface, IndexerInterface
     /**
      * @var array
      */
+    protected $ranges = array();
+
+    /**
+     * @var array
+     */
     protected $options = array();
 
     /**
@@ -104,6 +109,16 @@ class SphinxQL implements SearchInterface, IndexerInterface
     public function setFilter($key, $value)
     {
         $this->filters[$key] = (array)$value;
+
+        return $this;
+    }
+
+    public function setFilterRange($key, $min, $max)
+    {
+        $this->ranges[$key] = array(
+            'min' => $min,
+            'max' => $max
+        );
 
         return $this;
     }
@@ -249,6 +264,17 @@ class SphinxQL implements SearchInterface, IndexerInterface
                 } else {
                     $parts[] = sprintf('%s = %d', $key, (int)$value[0]);
                 }
+            }
+
+            $sql .= ' AND ' . implode(' AND ', $parts);
+        }
+
+        if (!empty($this->ranges)) {
+            $parts = array();
+
+            foreach ($this->ranges as $key => $value) {
+
+                $parts[] = sprintf('(%s BETWEEN %d AND %d)', $key, $value['min'], $value['max']);
             }
 
             $sql .= ' AND ' . implode(' AND ', $parts);

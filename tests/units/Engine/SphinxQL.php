@@ -24,6 +24,28 @@ class SphinxQL extends Search\Test\Unit
         $this->object($search)->isInstanceOf('\Search\Engine\SphinxQL');
     }
 
+    public function testGetPdo()
+    {
+        $search = new Search\Engine\SphinxQL();
+        $this->object($search->getPdo())->isInstanceOf('\PDO');
+
+        $that = $this;
+
+        $this->mockGenerator->orphanize('__construct');
+
+        $pdo = new \mock\PDO();
+
+        $this->calling($pdo)->setAttribute = function($key, $val) use ($that) {
+            $that->integer($key)->isEqualTo(\PDO::ATTR_DEFAULT_FETCH_MODE);
+            $that->integer($val)->isEqualTo(\PDO::FETCH_ASSOC);
+        };
+
+        $search = new Search\Engine\SphinxQL();
+        $search->setPdo($pdo);
+
+        $this->object($search->getPdo())->isEqualTo($pdo);
+    }
+
     public function testInsert()
     {
         $that = $this;
@@ -424,4 +446,58 @@ class SphinxQL extends Search\Test\Unit
 
         $this->integer($response->count())->isEqualTo(1);
     }
+
+
+    public function testSearchWithFilterRange()
+    {
+        $that = $this;
+
+        $this->mockGenerator->orphanize('__construct');
+
+        $pdo = new \mock\PDO();
+
+        $pdos = new \mock\PDOStatement();
+
+        $this->calling($pdos)->execute = function($params) {
+
+            return true;
+        };
+
+        $this->calling($pdos)->fetchAll = function() {
+            return array(
+                array(
+                    "id"    => 1,
+                    "name"  => 'Music'
+                )
+            );
+        };
+
+        $this->calling($pdo)->prepare = function($sql) use ($that, $pdos) {
+
+            $that->string("SELECT * FROM test WHERE MATCH(:term) AND (price BETWEEN 30 AND 70)")->isEqualTo($sql);
+
+            return $pdos;
+        };
+
+        $this->calling($pdo)->setAttribute = function($key, $val) use ($that) {
+            $that->integer($key)->isEqualTo(\PDO::ATTR_DEFAULT_FETCH_MODE);
+            $that->integer($val)->isEqualTo(\PDO::FETCH_ASSOC);
+        };
+
+        $search = new Search\Engine\SphinxQL();
+        $search->setPdo($pdo);
+        $search->setFilterRange('price', 30, 70);
+
+        $response = $search->search('music', 'test');
+
+        $this->object($response)
+            ->isInstanceOf('\Search\Engine\SphinxQL\Response');
+
+        $this->array($response->keys())->isEqualTo(array(
+            1
+        ));
+
+        $this->integer($response->count())->isEqualTo(1);
+    }
+
 }
