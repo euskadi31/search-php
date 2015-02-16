@@ -13,6 +13,9 @@ update: composer.phar
 test:
 	@./bin/atoum -bf ./tests/bootstrap.php -d ./tests/units
 
+test-loop:
+	@./bin/atoum --loop -bf ./tests/bootstrap.php -d ./tests/units
+
 clean:
 	@echo "Cleaning..."
 	@rm composer.phar
