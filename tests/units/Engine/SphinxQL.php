@@ -566,4 +566,59 @@ class SphinxQL extends Search\Test\Unit
         $this->integer($response->count())->isEqualTo(1);
     }
 
+
+    public function testSearchWithLimit()
+    {
+        $that = $this;
+
+        $this->mockGenerator->orphanize('__construct');
+
+        $pdo = new \mock\PDO();
+
+        $pdos = new \mock\PDOStatement();
+
+        $this->calling($pdos)->execute = function($params) {
+
+            return true;
+        };
+
+        $this->calling($pdos)->fetchAll = function() {
+            return array(
+                array(
+                    "id"    => 1,
+                    "name"  => 'Music'
+                )
+            );
+        };
+
+        $this->calling($pdo)->prepare = function($sql) use ($that, $pdos) {
+
+            $that->string("SELECT * FROM test WHERE MATCH(:term) LIMIT 1000")->isEqualTo($sql);
+
+            return $pdos;
+        };
+
+        $this->calling($pdo)->setAttribute = function($key, $val) use ($that) {
+            $that->integer($key)->isEqualTo(\PDO::ATTR_DEFAULT_FETCH_MODE);
+            $that->integer($val)->isEqualTo(\PDO::FETCH_ASSOC);
+        };
+
+        $search = new Search\Engine\SphinxQL();
+        $search->setPdo($pdo);
+        $search->setLimit(1000);
+
+        $this->integer($search->getLimit())->isEqualTo(1000);
+
+        $response = $search->search('music', 'test');
+
+        $this->object($response)
+            ->isInstanceOf('\Search\Engine\SphinxQL\Response');
+
+        $this->array($response->keys())->isEqualTo(array(
+            1
+        ));
+
+        $this->integer($response->count())->isEqualTo(1);
+    }
+
 }

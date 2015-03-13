@@ -76,6 +76,11 @@ class SphinxQL implements SearchInterface, IndexerInterface
     protected $distance_field = '_distance';
 
     /**
+     * @var integer
+     */
+    protected $limit;
+
+    /**
      *
      * @param string  $host
      * @param integer $port
@@ -140,6 +145,28 @@ class SphinxQL implements SearchInterface, IndexerInterface
     public function getDistanceField()
     {
         return $this->distance_field;
+    }
+
+    /**
+     * Set limit
+     *
+     * @param integer $limit
+     */
+    public function setLimit($limit)
+    {
+        $this->limit = (int) $limit;
+
+        return $this;
+    }
+
+    /**
+     * Get limit
+     *
+     * @return integer
+     */
+    public function getLimit()
+    {
+        return (int) $this->limit;
     }
 
     /**
@@ -356,6 +383,10 @@ class SphinxQL implements SearchInterface, IndexerInterface
             if (!empty($this->order)) {
                 $sql .= ' ' . $this->order;
             }
+        }
+
+        if (!empty($this->limit)) {
+            $sql .= sprintf(' LIMIT %d', (int) $this->limit);
         }
 
         if (!empty($this->options)) {
