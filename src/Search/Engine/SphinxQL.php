@@ -16,8 +16,10 @@ namespace Search\Engine;
 use RuntimeException;
 use PDO;
 use Search\Engine\SphinxQL\Response;
+use Search\SearchEvents;
+use Search\Event;
 
-class SphinxQL implements SearchInterface, IndexerInterface
+class SphinxQL extends AbstractEngine implements SearchInterface, IndexerInterface
 {
     /**
      *
@@ -271,6 +273,10 @@ class SphinxQL implements SearchInterface, IndexerInterface
      */
     public function insert($name, array $data)
     {
+        $this->getEventDispatcher()->dispatch(
+            SearchEvents::INSERT,
+            new Event\InsertEvent($name, $data)
+        );
         return $this->_into('INSERT', $name, $data);
     }
 
@@ -282,6 +288,10 @@ class SphinxQL implements SearchInterface, IndexerInterface
      */
     public function update($name, array $data)
     {
+        $this->getEventDispatcher()->dispatch(
+            SearchEvents::UPDATE,
+            new Event\UpdateEvent($name, $data)
+        );
         return $this->_into('REPLACE', $name, $data);
     }
 
@@ -293,6 +303,11 @@ class SphinxQL implements SearchInterface, IndexerInterface
      */
     public function delete($name, $id)
     {
+        $this->getEventDispatcher()->dispatch(
+            SearchEvents::DELETE,
+            new Event\DeleteEvent($name, $id)
+        );
+
         $primary = 'id';
 
         if (is_array($id)) {
@@ -399,8 +414,20 @@ class SphinxQL implements SearchInterface, IndexerInterface
             $sql .= ' OPTION ' . implode(', ', $parts);
         }
 
-        return new Response($this->fetch($sql, array(
+        $start = microtime(true);
+        $response = $this->fetch($sql, array(
             'term' => $term
-        )));
+        ));
+        $end = microtime(true);
+
+
+        $response = new Response($response);
+
+        $this->getEventDispatcher()->dispatch(
+            SearchEvents::RESPONSE,
+            new Event\ResponseEvent($index, $term, $response, ($end - $start))
+        );
+
+        return $response;
     }
 }

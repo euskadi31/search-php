@@ -24,6 +24,24 @@ class SphinxQL extends Search\Test\Unit
         $this->object($search)->isInstanceOf('\Search\Engine\SphinxQL');
     }
 
+    public function testEventDispatcher()
+    {
+        $search = new Search\Engine\SphinxQL();
+
+        $this->object($search->getEventDispatcher())
+            ->isInstanceOf('Symfony\Component\EventDispatcher\EventDispatcherInterface');
+
+        $dispatcher = new \mock\Symfony\Component\EventDispatcher\EventDispatcherInterface();
+
+        $search->setEventDispatcher($dispatcher);
+
+        $this->object($search->getEventDispatcher())
+            ->isInstanceOf('Symfony\Component\EventDispatcher\EventDispatcherInterface');
+
+        $this->object($search->getEventDispatcher())
+            ->isEqualTo($dispatcher);
+    }
+
     public function testGetPdo()
     {
         $search = new Search\Engine\SphinxQL();
@@ -90,6 +108,18 @@ class SphinxQL extends Search\Test\Unit
         $search = new Search\Engine\SphinxQL();
         $search->setPdo($pdo);
 
+        $dispatcher = new \mock\Symfony\Component\EventDispatcher\EventDispatcherInterface();
+
+        $that = $this;
+
+        $this->calling($dispatcher)->dispatch = function($eventName, \Symfony\Component\EventDispatcher\Event $event) use ($that) {
+            $that->object($event)->isInstanceOf('\Search\Event\InsertEvent');
+            $that->string($eventName)->isEqualTo('search.insert');
+            $that->string($event->getIndex())->isEqualTo('test');
+        };
+
+        $search->setEventDispatcher($dispatcher);
+
         $this->boolean($search->insert('test', array(
             "id"    => 1,
             "name"  => "Axel"
@@ -134,6 +164,16 @@ class SphinxQL extends Search\Test\Unit
 
         $search = new Search\Engine\SphinxQL();
         $search->setPdo($pdo);
+
+        $dispatcher = new \mock\Symfony\Component\EventDispatcher\EventDispatcherInterface();
+
+        $this->calling($dispatcher)->dispatch = function($eventName, \Symfony\Component\EventDispatcher\Event $event) use ($that) {
+            $that->object($event)->isInstanceOf('\Search\Event\ResponseEvent');
+            $that->string($eventName)->isEqualTo('search.response');
+            $that->string($event->getTerm())->isEqualTo('music');
+        };
+
+        $search->setEventDispatcher($dispatcher);
 
         $response = $search->search('music', 'test');
 
@@ -187,6 +227,10 @@ class SphinxQL extends Search\Test\Unit
         $search->setPdo($pdo);
         $search->setFilter('category_id', 123);
 
+        $dispatcher = new \mock\Symfony\Component\EventDispatcher\EventDispatcherInterface();
+
+        $search->setEventDispatcher($dispatcher);
+
         $response = $search->search('music', 'test');
 
         $this->object($response)
@@ -238,6 +282,10 @@ class SphinxQL extends Search\Test\Unit
         $search = new Search\Engine\SphinxQL();
         $search->setPdo($pdo);
         $search->setFilter('category_id', array(123, 456));
+
+        $dispatcher = new \mock\Symfony\Component\EventDispatcher\EventDispatcherInterface();
+
+        $search->setEventDispatcher($dispatcher);
 
         $response = $search->search('music', 'test');
 
@@ -292,6 +340,10 @@ class SphinxQL extends Search\Test\Unit
         $search->setFilter('category_id', 123);
         $search->setFilter('agency_id', 12);
 
+        $dispatcher = new \mock\Symfony\Component\EventDispatcher\EventDispatcherInterface();
+
+        $search->setEventDispatcher($dispatcher);
+
         $response = $search->search('music', 'test');
 
         $this->object($response)
@@ -344,6 +396,10 @@ class SphinxQL extends Search\Test\Unit
         $search->setPdo($pdo);
         $search->setOrderBy('id DESC');
 
+        $dispatcher = new \mock\Symfony\Component\EventDispatcher\EventDispatcherInterface();
+
+        $search->setEventDispatcher($dispatcher);
+
         $response = $search->search('music', 'test');
 
         $this->object($response)
@@ -395,6 +451,10 @@ class SphinxQL extends Search\Test\Unit
         $search = new Search\Engine\SphinxQL();
         $search->setPdo($pdo);
         $search->addOption('ranker', 'proximity');
+
+        $dispatcher = new \mock\Symfony\Component\EventDispatcher\EventDispatcherInterface();
+
+        $search->setEventDispatcher($dispatcher);
 
         $response = $search->search('music', 'test');
 
@@ -449,6 +509,10 @@ class SphinxQL extends Search\Test\Unit
         $search->addOption('ranker', 'proximity');
         $search->addOption('user_weight', '(title=100, content=20)');
 
+        $dispatcher = new \mock\Symfony\Component\EventDispatcher\EventDispatcherInterface();
+
+        $search->setEventDispatcher($dispatcher);
+
         $response = $search->search('music', 'test');
 
         $this->object($response)
@@ -502,6 +566,10 @@ class SphinxQL extends Search\Test\Unit
         $search->setPdo($pdo);
         $search->setFilterRange('price', 30, 70);
 
+        $dispatcher = new \mock\Symfony\Component\EventDispatcher\EventDispatcherInterface();
+
+        $search->setEventDispatcher($dispatcher);
+
         $response = $search->search('music', 'test');
 
         $this->object($response)
@@ -553,6 +621,10 @@ class SphinxQL extends Search\Test\Unit
         $search = new Search\Engine\SphinxQL();
         $search->setPdo($pdo);
         $search->setGeoFilter('lat', 'long', 48.82482710, 2.36966660, 10000);
+
+        $dispatcher = new \mock\Symfony\Component\EventDispatcher\EventDispatcherInterface();
+
+        $search->setEventDispatcher($dispatcher);
 
         $response = $search->search('music', 'test');
 
@@ -606,6 +678,10 @@ class SphinxQL extends Search\Test\Unit
         $search = new Search\Engine\SphinxQL();
         $search->setPdo($pdo);
         $search->setLimit(1000);
+
+        $dispatcher = new \mock\Symfony\Component\EventDispatcher\EventDispatcherInterface();
+
+        $search->setEventDispatcher($dispatcher);
 
         $this->integer($search->getLimit())->isEqualTo(1000);
 
