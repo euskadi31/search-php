@@ -65,7 +65,7 @@ class Response extends Search\Test\Unit
                     "weight"    => 2302
                 ));
 
-        $this->array([1, 5])
+        $this->array(array(1, 5))
             ->isEqualTo($response->keys());
 
         $this->array($response->current())
