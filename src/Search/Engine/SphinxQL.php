@@ -322,13 +322,13 @@ class SphinxQL extends AbstractEngine implements SearchInterface, IndexerInterfa
         return $query->execute();
     }
 
-    protected function getCacheKey($sql, array $parameters)
+    public function getCacheKey($sql, array $parameters)
     {
         foreach ($parameters as $key => $value) {
             $sql = str_replace($key, $value, $sql);
         }
 
-        $hash = hash('sha1', mb_strtolower($sql));
+        return hash('sha1', mb_strtolower($sql));
     }
 
     /**

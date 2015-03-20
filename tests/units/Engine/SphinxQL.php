@@ -48,6 +48,13 @@ class SphinxQL extends Search\Test\Unit
 
         $this->integer($search->getCacheLife())
             ->isEqualTo(10);
+
+        $this->string($search->getCacheKey(
+            'SELECT * FROM test WHERE MATCH(:term) OPTION ranker = proximity, user_weight = (title=100, content=20)',
+            [
+                ':term' => 'music'
+            ]
+        ))->isEqualTo('a6de6a1617a0cbf3291363e59ed23a1b0ebb1be2');
     }
 
     public function testEventDispatcher()
