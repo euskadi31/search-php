@@ -322,6 +322,15 @@ class SphinxQL extends AbstractEngine implements SearchInterface, IndexerInterfa
         return $query->execute();
     }
 
+    protected function getCacheKey($sql, array $parameters)
+    {
+        foreach ($parameters as $key => $value) {
+            $sql = str_replace($key, $value, $sql);
+        }
+
+        $hash = hash('sha1', mb_strtolower($sql));
+    }
+
     /**
      *
      * @param  string $sql  the SphinxQL string
@@ -336,10 +345,19 @@ class SphinxQL extends AbstractEngine implements SearchInterface, IndexerInterfa
             $parameters[':' . trim($key, ':')] = $value;
         }
 
-        $query = $this->getPdo()->prepare($sql);
-        $query->execute($parameters);
+        $hash = $this->getCacheKey($sql, $parameters);
 
-        return $query->fetchAll();
+        if (!$response = $this->getCache()->fetch($hash)) {
+
+            $query = $this->getPdo()->prepare($sql);
+            $query->execute($parameters);
+
+            $response = $query->fetchAll();
+
+            $this->getCache()->save($hash, $response, $this->getCacheLife());
+        }
+
+        return $response;
     }
 
     /**
@@ -419,7 +437,6 @@ class SphinxQL extends AbstractEngine implements SearchInterface, IndexerInterfa
             'term' => $term
         ));
         $end = microtime(true);
-
 
         $response = new Response($response);
 

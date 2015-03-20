@@ -24,6 +24,32 @@ class SphinxQL extends Search\Test\Unit
         $this->object($search)->isInstanceOf('\Search\Engine\SphinxQL');
     }
 
+    public function testCache()
+    {
+        $search = new Search\Engine\SphinxQL();
+
+        $this->object($search->getCache())
+            ->isInstanceOf('\Doctrine\Common\Cache\ArrayCache');
+
+        $cache = new \mock\Doctrine\Common\Cache\ApcCache();
+
+        $search->setCache($cache);
+
+        $this->object($search->getCache())
+            ->isInstanceOf('\Doctrine\Common\Cache\ApcCache');
+
+        $this->object($search->getCache())
+            ->isEqualTo($cache);
+
+        $this->integer($search->getCacheLife())
+            ->isEqualTo(0);
+
+        $search->setCacheLife(10);
+
+        $this->integer($search->getCacheLife())
+            ->isEqualTo(10);
+    }
+
     public function testEventDispatcher()
     {
         $search = new Search\Engine\SphinxQL();
@@ -174,6 +200,75 @@ class SphinxQL extends Search\Test\Unit
         };
 
         $search->setEventDispatcher($dispatcher);
+
+        $response = $search->search('music', 'test');
+
+        $this->object($response)
+            ->isInstanceOf('\Search\Engine\SphinxQL\Response');
+
+        $this->array($response->keys())->isEqualTo(array(
+            1
+        ));
+
+        $this->integer($response->count())->isEqualTo(1);
+    }
+
+    public function testSearchWithCache()
+    {
+        $that = $this;
+
+        $this->mockGenerator->orphanize('__construct');
+
+        $pdo = new \mock\PDO();
+
+        $pdos = new \mock\PDOStatement();
+
+        $this->calling($pdos)->execute = function($params) {
+
+            return true;
+        };
+
+        $this->calling($pdos)->fetchAll = function() {
+            return array(
+                array(
+                    "id"    => 1,
+                    "name"  => 'Music'
+                )
+            );
+        };
+
+        $called = 0;
+
+        $this->calling($pdo)->prepare = function($sql) use ($that, $pdos, &$called) {
+
+            $that->string("SELECT * FROM test WHERE MATCH(:term)")->isEqualTo($sql);
+
+            $called++;
+
+            $that->integer($called)->isEqualTo(1);
+
+            return $pdos;
+        };
+
+        $this->calling($pdo)->setAttribute = function($key, $val) use ($that) {
+            $that->integer($key)->isEqualTo(\PDO::ATTR_DEFAULT_FETCH_MODE);
+            $that->integer($val)->isEqualTo(\PDO::FETCH_ASSOC);
+        };
+
+        $search = new Search\Engine\SphinxQL();
+        $search->setPdo($pdo);
+
+        $dispatcher = new \mock\Symfony\Component\EventDispatcher\EventDispatcherInterface();
+
+        $this->calling($dispatcher)->dispatch = function($eventName, \Symfony\Component\EventDispatcher\Event $event) use ($that) {
+            $that->object($event)->isInstanceOf('\Search\Event\ResponseEvent');
+            $that->string($eventName)->isEqualTo('search.response');
+            $that->string($event->getTerm())->isEqualTo('music');
+        };
+
+        $search->setEventDispatcher($dispatcher);
+
+        $response = $search->search('music', 'test');
 
         $response = $search->search('music', 'test');
 

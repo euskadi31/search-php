@@ -15,6 +15,8 @@ namespace Search\Engine;
 
 use Symfony\Component\EventDispatcher\EventDispatcher;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
+use Doctrine\Common\Cache\Cache;
+use Doctrine\Common\Cache\ArrayCache;
 
 abstract class AbstractEngine
 {
@@ -24,9 +26,21 @@ abstract class AbstractEngine
     protected $dispatcher;
 
     /**
+     * @var Cache
+     */
+    protected $cache;
+
+    /**
+     * @var integer
+     */
+    protected $cache_life_time = 0;
+
+
+    /**
      * Set event dispatcher
      *
      * @param EventDispatcherInterface $dispatcher
+     * @return AbstractEngine
      */
     public function setEventDispatcher(EventDispatcherInterface $dispatcher)
     {
@@ -47,5 +61,55 @@ abstract class AbstractEngine
         }
 
         return $this->dispatcher;
+    }
+
+    /**
+     * Set cache driver
+     *
+     * @param Cache $cache
+     * @return AbstractEngine
+     */
+    public function setCache(Cache $cache)
+    {
+        $this->cache = $cache;
+
+        return $this;
+    }
+
+    /**
+     * Get cache driver
+     *
+     * @return Cache
+     */
+    public function getCache()
+    {
+        if (is_null($this->cache)) {
+            $this->cache = new ArrayCache();
+        }
+
+        return $this->cache;
+    }
+
+    /**
+     * Set Cache life time
+     *
+     * @param integer $time
+     * @return AbstractEngine
+     */
+    public function setCacheLife($time)
+    {
+        $this->cache_life_time = (int) $time;
+
+        return $this;
+    }
+
+    /**
+     * Get cache life time
+     *
+     * @return integer
+     */
+    public function getCacheLife()
+    {
+        return $this->cache_life_time;
     }
 }
