@@ -726,7 +726,7 @@ class SphinxQL extends Search\Test\Unit
 
         $this->calling($pdo)->prepare = function($sql) use ($that, $pdos) {
 
-            $that->string("SELECT *, GEODIST(48.824827, 2.369667, lat, long) AS _distance FROM test WHERE MATCH(:term) AND _distance < 10000 ORDER BY _distance ASC")->isEqualTo($sql);
+            $that->string("SELECT *, GEODIST(48.824827, 2.369667, lat, long, {in=degrees, out=meters}) AS _distance FROM test WHERE MATCH(:term) AND _distance < 10000 ORDER BY _distance ASC")->isEqualTo($sql);
 
             return $pdos;
         };

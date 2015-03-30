@@ -197,7 +197,7 @@ class SphinxQL extends AbstractEngine implements SearchInterface, IndexerInterfa
     public function setGeoFilter($key_lat, $key_long, $latitude, $longitude, $distance)
     {
         $this->fields[] = sprintf(
-            'GEODIST(%F, %F, %s, %s) AS %s',
+            'GEODIST(%F, %F, %s, %s, {in=degrees, out=meters}) AS %s',
             $latitude,
             $longitude,
             $key_lat,
