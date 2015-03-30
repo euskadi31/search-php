@@ -347,6 +347,8 @@ class SphinxQL extends AbstractEngine implements SearchInterface, IndexerInterfa
 
         $hash = $this->getCacheKey($sql, $parameters);
 
+        $is_cached = true;
+
         if (!$response = $this->getCache()->fetch($hash)) {
 
             $query = $this->getPdo()->prepare($sql);
@@ -355,7 +357,14 @@ class SphinxQL extends AbstractEngine implements SearchInterface, IndexerInterfa
             $response = $query->fetchAll();
 
             $this->getCache()->save($hash, $response, $this->getCacheLife());
+
+            $is_cached = false;
         }
+
+        $this->getEventDispatcher()->dispatch(
+            SearchEvents::REQUEST,
+            new Event\RequestEvent($sql, $is_cached)
+        );
 
         return $response;
     }

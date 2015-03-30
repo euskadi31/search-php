@@ -201,9 +201,17 @@ class SphinxQL extends Search\Test\Unit
         $dispatcher = new \mock\Symfony\Component\EventDispatcher\EventDispatcherInterface();
 
         $this->calling($dispatcher)->dispatch = function($eventName, \Symfony\Component\EventDispatcher\Event $event) use ($that) {
-            $that->object($event)->isInstanceOf('\Search\Event\ResponseEvent');
-            $that->string($eventName)->isEqualTo('search.response');
-            $that->string($event->getTerm())->isEqualTo('music');
+            switch ($eventName) {
+                case Search\SearchEvents::RESPONSE:
+                    $that->object($event)->isInstanceOf('\Search\Event\ResponseEvent');
+                    $that->string($eventName)->isEqualTo('search.response');
+                    $that->string($event->getTerm())->isEqualTo('music');
+                    break;
+                case Search\SearchEvents::REQUEST:
+                    $that->object($event)->isInstanceOf('\Search\Event\RequestEvent');
+                    $that->string($eventName)->isEqualTo('search.request');
+                    break;
+            }
         };
 
         $search->setEventDispatcher($dispatcher);
@@ -268,9 +276,17 @@ class SphinxQL extends Search\Test\Unit
         $dispatcher = new \mock\Symfony\Component\EventDispatcher\EventDispatcherInterface();
 
         $this->calling($dispatcher)->dispatch = function($eventName, \Symfony\Component\EventDispatcher\Event $event) use ($that) {
-            $that->object($event)->isInstanceOf('\Search\Event\ResponseEvent');
-            $that->string($eventName)->isEqualTo('search.response');
-            $that->string($event->getTerm())->isEqualTo('music');
+            switch ($eventName) {
+                case Search\SearchEvents::RESPONSE:
+                    $that->object($event)->isInstanceOf('\Search\Event\ResponseEvent');
+                    $that->string($eventName)->isEqualTo('search.response');
+                    $that->string($event->getTerm())->isEqualTo('music');
+                    break;
+                case Search\SearchEvents::REQUEST:
+                    $that->object($event)->isInstanceOf('\Search\Event\RequestEvent');
+                    $that->string($eventName)->isEqualTo('search.request');
+                    break;
+            }
         };
 
         $search->setEventDispatcher($dispatcher);
